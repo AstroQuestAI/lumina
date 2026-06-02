@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#bfd8ef">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="VCAST">
+<title>VCAST</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET ─────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* ─── TOKENS ─────────────────────────────────── */
+:root{
+  --bg:       #e7f4ff;
+  --bg2:      #d6ebfb;
+  --bg3:      #c8ddf0;
+  --bg4:      #f2f9ff;
+  --layer1:   rgba(255,255,255,.70);
+  --layer2:   rgba(255,255,255,.86);
+  --layer3:   #cddfec;
+  --layer4:   #b7cfe3;
+  --edge:     #b9cbdb;
+  --edge1:    #c8d8e6;
+  --edge2:    #a9c0d2;
+
+  --fg:       #12263a;
+  --fg2:      #3f556a;
+  --fg3:      #637a8e;
+
+  --accent:   #f2a93b;
+  --accent2:  #f7c35d;
+  --accent3:  #e58c1d;
+  --a-dim:    rgba(242,169,59,.10);
+  --a-glow:   rgba(242,169,59,.24);
+
+  --green:    #0f9b74;
+  --g-dim:    rgba(15,155,116,.10);
+  --amber:    #d47c14;
+  --b-dim:    rgba(212,124,20,.10);
+  --red:      #d94b4b;
+  --r-dim:    rgba(217,75,75,.10);
+  --blue:     #3e7fdc;
+  --bl-dim:   rgba(62,127,220,.10);
+
+  --r:18px;--rs:14px;--rx:10px;
+  --font:'Inter',system-ui,sans-serif;
+  --serif:'DM Serif Display',Georgia,serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+  --fast:.18s;--mid:.26s;
+  --shine:inset 0 1px 0 rgba(255,255,255,.86),inset 0 -1px 0 rgba(62,127,220,.04);
+  --shadow:0 12px 28px rgba(39,92,145,.08),0 2px 8px rgba(39,92,145,.05);
+  --glow-accent:0 8px 24px rgba(242,169,59,.20);
+}
+/* ─── BASE ─────────────────────────────────── */
+html,body{height:100%;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 36%,var(--bg3) 70%,var(--bg4) 100%);font-family:var(--font);color:var(--fg);-webkit-font-smoothing:antialiased;font-size:15px}
+#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;overflow:hidden}
+body::before{
+  content:'';
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 460px 340px at 12% 10%, rgba(255,236,165,.32) 0%, transparent 72%),
+    radial-gradient(ellipse 380px 340px at 88% 16%, rgba(187,221,255,.46) 0%, transparent 74%),
+    radial-gradient(ellipse 340px 300px at 18% 82%, rgba(122,171,214,.20) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 360px at 75% 86%, rgba(255,214,147,.18) 0%, transparent 75%),
+    linear-gradient(180deg, rgba(255,255,255,.30), transparent 38%, rgba(211,233,249,.18));
+}
+
+/* ─── SCREENS ─────────────────────────────── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(22px);transition:opacity var(--mid) var(--ease),transform var(--mid) var(--ease);background:transparent}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.screen.out{opacity:0;transform:translateX(-22px)}
+
+/* ─── STATUS BAR ─────────────────────────── */
+.sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px 4px;font-size:11px;color:var(--fg2);flex-shrink:0;font-weight:600;letter-spacing:.2px}
+.sbar-icons{display:flex;gap:5px;align-items:center}
+
+/* ─── TOPBAR ─────────────────────────────── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 12px;flex-shrink:0}
+.topbar-left{display:flex;flex-direction:column;gap:2px}
+.eyebrow{font-size:10px;font-weight:600;color:var(--accent);letter-spacing:1.4px;text-transform:uppercase;text-shadow:0 0 10px rgba(242,169,59,.18)}
+.page-title{font-family:var(--serif);font-size:21px;font-weight:400;color:var(--fg);letter-spacing:-.2px;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.55),0 0 14px rgba(18,38,58,.06)}
+.icon-btn{width:40px;height:40px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--layer2);border:1px solid var(--edge1);color:var(--fg2);cursor:pointer;transition:all var(--fast) var(--ease);box-shadow:var(--shine),var(--shadow)}
+.icon-btn:hover{box-shadow:var(--shine),0 14px 30px rgba(39,92,145,.10),0 0 18px rgba(242,169,59,.12)}
+.icon-btn:active{background:var(--layer3);border-color:var(--edge2)}
+.icon-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ─── PROGRESS RAIL ──────────────────────── */
+.progress-rail{padding:4px 18px 10px;flex-shrink:0}
+.progress-stages{display:flex;align-items:center;gap:0}
+.ps{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:default}
+.ps-dot{width:8px;height:8px;border-radius:50%;background:var(--edge2);transition:all var(--mid) var(--ease);position:relative;z-index:1}
+.ps-dot.done{background:var(--accent);box-shadow:0 0 8px var(--a-glow)}
+.ps-dot.active{background:var(--accent2);box-shadow:0 0 12px var(--a-glow);width:10px;height:10px}
+.ps-label{font-size:9px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--fg3);transition:color var(--fast)}
+.ps-label.done,.ps-label.active{color:var(--accent)}
+.ps-line{flex:1;height:1px;background:var(--edge1);margin:0 -1px;position:relative;top:4px;transition:background var(--mid) var(--ease)}
+.ps-line.done{background:var(--accent3)}
+
+/* ─── SCROLL BODY ─────────────────────────── */
+.body{flex:1;overflow-y:auto;padding:4px 18px 20px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
+.body::-webkit-scrollbar{display:none}
+
+/* ─── BOTTOM NAV ──────────────────────────── */
+.nav{display:flex;border-top:1px solid rgba(196,216,231,.72);background:rgba(229,241,251,.74);backdrop-filter:blur(22px) saturate(120%);-webkit-backdrop-filter:blur(22px) saturate(120%);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0);box-shadow:0 -10px 28px rgba(120,160,190,.08)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0 8px;font-size:9px;font-weight:700;color:var(--fg3);cursor:pointer;border:none;background:none;letter-spacing:.7px;text-transform:uppercase;transition:color var(--fast),transform var(--fast)}
+.ni svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ni.on{color:var(--accent);text-shadow:0 0 12px rgba(242,169,59,.18)}
+.ni.on svg{stroke:var(--accent)}
+
+/* ─── SECTION LABEL ───────────────────────── */
+.sec{font-size:10px;font-weight:600;color:var(--fg3);letter-spacing:1px;text-transform:uppercase;padding-bottom:2px}
+
+/* ─── CARDS ───────────────────────────────── */
+.card{background:var(--layer2);border:1px solid rgba(214,232,246,.90);border-radius:var(--r);padding:16px;box-shadow:var(--shine),var(--shadow)}
+.card-accent{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,249,236,.82));border:1px solid rgba(242,169,59,.28);border-radius:var(--r);padding:16px;box-shadow:var(--shine),var(--glow-accent)}
+
+/* ─── FORMAT PICKER ───────────────────────── */
+.fmt-row{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.fmt{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 4px;border-radius:16px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--fg3);background:var(--layer2);border:1px solid var(--edge1);cursor:pointer;transition:all var(--fast) var(--ease);box-shadow:var(--shine),var(--shadow)}
+.fmt svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fmt.on{background:var(--a-dim);border-color:var(--accent2);color:var(--accent);box-shadow:0 0 0 1px var(--a-glow),0 0 20px rgba(242,169,59,.10),var(--shine)}
+.fmt:active{transform:scale(.95)}
+
+/* ─── UPLOAD ZONE ─────────────────────────── */
+.zone{border:1px dashed var(--edge2);border-radius:var(--r);padding:34px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:all var(--mid) var(--ease);background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(243,248,255,.76))}
+.zone:active{border-color:var(--accent3);background:var(--a-dim)}
+.zone-ring{width:56px;height:56px;border-radius:50%;border:1.5px solid rgba(242,169,59,.42);display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,247,225,.98),rgba(255,255,255,.88));box-shadow:0 0 0 10px rgba(242,169,59,.05),0 0 22px rgba(255,215,120,.12),var(--glow-accent)}
+.zone-ring svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.zone-title{font-family:var(--serif);font-size:17px;color:var(--fg);font-style:italic}
+.zone-sub{font-size:11px;color:var(--fg3);text-align:center;line-height:1.6}
+
+/* ─── FILE PREVIEW ────────────────────────── */
+.file-preview{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);display:flex;align-items:center;gap:12px;padding:12px 14px;box-shadow:var(--shine)}
+.fp-icon{width:42px;height:42px;border-radius:9px;background:linear-gradient(135deg,rgba(91,61,245,.10),rgba(124,98,248,.16));border:1.5px solid var(--accent2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fp-icon svg{width:19px;height:19px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.fp-name{font-size:13px;font-weight:500;color:var(--fg)}
+.fp-meta{font-size:11px;color:var(--fg3);margin-top:2px}
+
+/* ─── INPUTS ──────────────────────────────── */
+textarea,input[type=text],input[type=password]{width:100%;background:var(--layer1);border:1px solid var(--edge1);border-radius:var(--rs);padding:12px 13px;font-family:var(--font);font-size:13px;color:var(--fg);outline:none;resize:none;transition:all var(--fast);font-weight:400;letter-spacing:.1px}
+textarea:focus,input:focus{border-color:var(--accent3);box-shadow:0 0 0 3px var(--a-dim)}
+textarea::placeholder,input::placeholder{color:var(--fg3)}
+
+/* ─── CHANNEL ITEMS ───────────────────────── */
+.ch-item{display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:16px;background:var(--layer2);border:1px solid var(--edge1);cursor:pointer;transition:all var(--fast) var(--ease);box-shadow:var(--shine),var(--shadow)}
+.ch-item.on{border-color:rgba(242,169,59,.48);background:linear-gradient(180deg,rgba(255,249,236,.90),rgba(244,248,255,.92));box-shadow:0 0 0 2px rgba(242,169,59,.08),0 0 18px rgba(242,169,59,.06),var(--shadow)}
+.ch-item:active{transform:scale(.99)}
+.ch-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;letter-spacing:.3px}
+.ch-name{font-size:13px;font-weight:500;color:var(--fg);flex:1}
+.ch-meta{font-size:11px;color:var(--fg3);margin-top:2px}
+.ch-box{width:20px;height:20px;border-radius:6px;border:1px solid var(--edge2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all var(--fast);background:var(--layer1)}
+.ch-box.on{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:var(--accent2);box-shadow:0 2px 8px var(--a-glow)}
+.ch-box svg{width:11px;height:11px;stroke:#0c0c0f;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+/* ─── REACH COUNTER ───────────────────────── */
+.reach-bar{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shine)}
+.reach-label{font-size:10px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase}
+.reach-count{font-family:var(--serif);font-size:22px;color:var(--accent);letter-spacing:-.5px}
+
+/* ─── TIMING TOGGLE ───────────────────────── */
+.timing-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.timing-btn{padding:12px 0;border-radius:var(--rs);font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--edge1);color:var(--fg2);background:var(--layer2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all var(--fast) var(--ease);box-shadow:var(--shine)}
+.timing-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.timing-btn.on{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);border-color:var(--accent2);color:#fff;box-shadow:var(--glow-accent)}
+
+/* ─── SUMMARY TABLE ───────────────────────── */
+.sum-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--edge1)}
+.sum-row:last-child{border-bottom:none}
+.sk{font-size:11px;color:var(--fg3);font-weight:500;letter-spacing:.2px;padding-top:1px}
+.sv{font-size:13px;font-weight:500;color:var(--fg);text-align:right;max-width:200px}
+
+/* ─── SEND BUTTON ─────────────────────────── */
+.btn-send{width:100%;border:none;border-radius:18px;padding:16px;font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);color:#fff;box-shadow:0 10px 26px rgba(242,169,59,.18),0 0 20px rgba(255,220,140,.12);transition:all var(--fast) var(--ease);position:relative;overflow:hidden}
+.btn-send::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12) 0%,transparent 55%);pointer-events:none}
+.btn-send:active{transform:scale(.98);box-shadow:none}
+.btn-send:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-ghost{width:100%;background:transparent;color:var(--fg2);border:1px solid var(--edge1);border-radius:18px;padding:14px;font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all var(--fast)}
+.btn-ghost:active{background:var(--layer3);color:var(--accent);border-color:var(--accent3)}
+
+/* ─── STATUS RING (live send) ─────────────── */
+.send-status{display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px 0 8px}
+.ring-wrap{width:72px;height:72px;position:relative}
+.ring-bg{fill:none;stroke:var(--edge1);stroke-width:4}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;stroke-dasharray:188;stroke-dashoffset:188;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.8s var(--ease);filter:drop-shadow(0 0 4px rgba(242,169,59,.35))}
+.ring-fill.done{stroke-dashoffset:0}
+.ring-fill.sending{animation:ring-spin 1.4s linear infinite}
+@keyframes ring-spin{to{stroke-dashoffset:-188}}
+.ring-num{font-family:var(--serif);font-size:20px;color:var(--accent);font-weight:600;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+
+/* ─── ANALYTICS ───────────────────────────── */
+.hero-metric{background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(237,247,255,.86));border:1px solid rgba(214,232,246,.92);border-radius:24px;padding:20px;position:relative;overflow:hidden;box-shadow:var(--shine),var(--shadow),0 0 24px rgba(255,221,125,.08)}
+.hero-metric::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);border-radius:12px 12px 0 0}
+.hm-label{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.hm-number{font-family:var(--serif);font-size:38px;color:var(--accent);letter-spacing:-2px;line-height:1}
+.hm-sub{font-size:11px;color:var(--fg3);margin-top:5px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-c{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:14px;box-shadow:var(--shine)}
+.stat-n{font-family:var(--serif);font-size:28px;font-weight:400;letter-spacing:-1px;line-height:1}
+.stat-l{font-size:9px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--fg3);margin-top:4px}
+
+/* ─── LOG ROWS ────────────────────────────── */
+.log-row{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:var(--rx);background:var(--layer2);border:1px solid var(--edge1)}
+.ld{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.lt{font-size:12px;font-weight:500;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lm{font-size:10px;color:var(--fg3);margin-top:2px}
+.ltime{font-size:10px;color:var(--fg3);flex-shrink:0;font-weight:500;letter-spacing:.1px}
+
+/* ─── SETTINGS ROWS ───────────────────────── */
+.s-row{display:flex;align-items:center;gap:12px;padding:13px;border-radius:16px;background:var(--layer2);border:1px solid var(--edge1);box-shadow:var(--shine),var(--shadow),0 0 16px rgba(255,255,255,.18)}
+.s-icon{width:34px;height:34px;border-radius:var(--rx);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.s-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.s-name{font-size:13px;font-weight:500;color:var(--fg)}
+.s-sub{font-size:11px;color:var(--fg3);margin-top:1px}
+.toggle{width:40px;height:22px;border-radius:11px;display:flex;align-items:center;padding:2px;cursor:pointer;transition:background var(--mid) var(--ease);flex-shrink:0}
+.toggle.on{background:linear-gradient(135deg,var(--accent),var(--accent2));justify-content:flex-end;box-shadow:0 2px 8px var(--a-glow)}
+.toggle.off{background:var(--layer3);border:1px solid var(--edge1);justify-content:flex-start}
+.tknob{width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+
+/* ─── BADGES ──────────────────────────────── */
+.badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:3px 8px;border-radius:3px;letter-spacing:.6px;text-transform:uppercase}
+.b-green{background:var(--g-dim);color:var(--green);border:1px solid rgba(62,207,142,.25)}
+.b-muted{background:var(--layer3);color:var(--fg3);border:1px solid var(--edge1)}
+.b-amber{background:var(--b-dim);color:var(--amber);border:1px solid rgba(240,180,41,.25)}
+
+/* ─── NOTICES ─────────────────────────────── */
+.notice{display:flex;align-items:flex-start;gap:9px;border-radius:var(--rs);padding:12px 13px}
+.notice svg{width:15px;height:15px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px}
+.notice p{font-size:11px;line-height:1.6;font-weight:500}
+.n-green{background:var(--g-dim);border:1px solid rgba(62,207,142,.2)}
+.n-green svg{stroke:var(--green)}
+.n-green p{color:rgba(62,207,142,.85)}
+.n-blue{background:var(--bl-dim);border:1px solid rgba(96,165,250,.2)}
+.n-blue svg{stroke:var(--blue)}
+.n-blue p{color:rgba(96,165,250,.85)}
+
+/* ─── PROFILE STRIP ───────────────────────── */
+.p-strip{display:flex;align-items:center;gap:13px;padding:14px 18px 15px;border-bottom:1px solid var(--edge1);background:var(--layer1)}
+.p-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:16px;color:#fff;box-shadow:0 8px 20px rgba(242,169,59,.18),0 0 18px rgba(255,215,120,.12)}
+.p-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--fg)}
+.p-email{font-size:11px;color:var(--fg3);margin-top:1px}
+.wordmark{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--accent);letter-spacing:.5px;font-weight:700}
+
+/* ─── ONBOARDING STEPS ─────────────────────── */
+.ob-icon{width:62px;height:62px;border-radius:20px;background:linear-gradient(135deg,rgba(242,169,59,.14),rgba(62,127,220,.10));border:1.5px solid rgba(242,169,59,.24);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 22px rgba(255,215,120,.10),var(--glow-accent)}
+.ob-icon svg{width:28px;height:28px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ob-title{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--fg);font-style:italic}
+.ob-desc{font-size:13px;color:var(--fg2);line-height:1.65}
+.step-row{display:flex;gap:12px;align-items:flex-start}
+.step-n{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-title{font-size:13px;font-weight:500;color:var(--fg)}
+.step-desc{font-size:11px;color:var(--fg3);line-height:1.55;margin-top:2px}
+.dot-row{display:flex;gap:5px;justify-content:center}
+.dot{height:3px;border-radius:2px;transition:all .28s var(--ease)}
+.dot.on{background:linear-gradient(90deg,var(--accent),var(--accent2));width:22px}
+.dot:not(.on){width:5px;background:var(--edge2)}
+
+/* ─── SEARCH ───────────────────────────────── */
+.search{display:flex;align-items:center;gap:9px;background:var(--layer1);border:1.5px solid var(--edge1);border-radius:var(--rs);padding:10px 13px;box-shadow:var(--shine)}
+.search svg{width:14px;height:14px;stroke:var(--fg3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.search input{background:none;border:none;outline:none;font-size:13px;color:var(--fg);font-family:var(--font);flex:1}
+.search input::placeholder{color:var(--fg3)}
+
+/* ─── OVERLAY (dispatch) ─────────────────── */
+#overlay{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(222,236,247,.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+#overlay.show{display:flex}
+.ov-ring{width:56px;height:56px;border-radius:50%;border:2px solid var(--edge1);border-top-color:var(--accent);animation:spin .9s linear infinite;box-shadow:0 0 16px var(--a-glow),0 0 0 8px rgba(91,61,245,.05)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ov-label{font-family:var(--serif);font-size:19px;font-style:italic;color:var(--accent)}
+.ov-sub{font-size:10px;color:var(--fg3);letter-spacing:1px;text-transform:uppercase}
+
+/* ─── TOAST ───────────────────────────────── */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--fg);border:1px solid var(--edge2);color:#fff;font-size:12px;font-weight:500;padding:9px 17px;border-radius:var(--rx);opacity:0;transition:all var(--mid) var(--ease);pointer-events:none;white-space:nowrap;z-index:999;box-shadow:var(--glow-accent);letter-spacing:.1px}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── ANIMATIONS ──────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.screen.active .body > *{animation:fadeUp .22s var(--ease) both}
+.screen.active .body > *:nth-child(1){animation-delay:.04s}
+.screen.active .body > *:nth-child(2){animation-delay:.08s}
+.screen.active .body > *:nth-child(3){animation-delay:.12s}
+.screen.active .body > *:nth-child(4){animation-delay:.16s}
+.screen.active .body > *:nth-child(5){animation-delay:.20s}
+.screen.active .body > *:nth-child(6){animation-delay:.24s}
+.screen.active .body > *:nth-child(7){animation-delay:.28s}
+input[type=datetime-local]{color-scheme:light}
+hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══════════════ SCREEN: COMPOSE ═══════════════ -->
+<div class="screen" id="s-compose">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
+  <div class="topbar">
+    <div class="topbar-left"><div class="eyebrow">New broadcast · 1 of 4</div><div class="page-title">Compose</div></div>
+    <button class="icon-btn" onclick="go('s-settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+  <div class="progress-rail" id="pr-compose"></div>
+  <div class="body">
+    <div class="sec">Content format</div>
+    <div class="fmt-row">
+      <div class="fmt on" onclick="pickFmt(this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Image</div>
+      <div class="fmt" onclick="pickFmt(this)"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Video</div>
+      <div class="fmt" onclick="pickFmt(this)"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Link</div>
+      <div class="fmt" onclick="pickFmt(this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>PDF</div>
+      <div class="fmt" onclick="pickFmt(this)"><svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>Text</div>
+    </div>
+
+    <div class="zone" id="zone" onclick="stageUpload()">
+      <div class="zone-ring"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <span class="zone-title">Upload content</span>
+      <span class="zone-sub">Images · Videos · PDFs · Links<br>Maximum 50 MB</span>
+    </div>
+
+    <div class="file-preview" id="fp" style="display:none">
+      <div class="fp-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div class="fp-name" id="fp-name">campaign_visual.jpg</div>
+        <div class="fp-meta">1.6 MB · Staged and ready</div>
+      </div>
+      <span class="badge b-green">Ready</span>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div class="sec">Accompanying message</div>
+      <textarea id="caption" rows="3" placeholder="Optional message for your audience…"></textarea>
+    </div>
+
+    <button class="btn-send" onclick="go('s-select')">Continue — Select channels</button>
+  </div>
+  <div class="nav">
+    <button class="ni on" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
+    <button class="ni" onclick="nav('analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</button>
+    <button class="ni" onclick="nav('settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Control</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: SELECT ═══════════════ -->
+<div class="screen" id="s-select">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
+  <div class="topbar">
+    <div class="topbar-left"><div class="eyebrow">New broadcast · 2 of 4</div><div class="page-title">Select</div></div>
+    <button style="font-size:11px;font-weight:600;color:var(--accent);background:none;border:none;cursor:pointer;letter-spacing:.5px;text-transform:uppercase" onclick="selectAll()">All</button>
+  </div>
+  <div class="progress-rail" id="pr-select"></div>
+  <div class="body">
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Search channels…" oninput="filterCh(this.value)"></div>
+
+    <div class="sec">Telegram · 4 channels</div>
+    <div id="ch-list" style="display:flex;flex-direction:column;gap:8px">
+      <div class="ch-item on" onclick="toggleCh(this)"><div class="ch-av" style="background:var(--bl-dim);color:var(--blue)">TF</div><div style="flex:1;min-width:0"><div class="ch-name">Tech Founders Hub</div><div class="ch-meta">1,240 members</div></div><div class="ch-box on"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ch-item on" onclick="toggleCh(this)"><div class="ch-av" style="background:var(--a-dim);color:var(--accent)">MK</div><div style="flex:1;min-width:0"><div class="ch-name">Marketing Team</div><div class="ch-meta">38 members</div></div><div class="ch-box on"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ch-item" onclick="toggleCh(this)"><div class="ch-av" style="background:var(--g-dim);color:var(--green)">AN</div><div style="flex:1;min-width:0"><div class="ch-name">Announcements</div><div class="ch-meta">872 members</div></div><div class="ch-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="ch-item" onclick="toggleCh(this)"><div class="ch-av" style="background:var(--b-dim);color:var(--amber)">CS</div><div style="flex:1;min-width:0"><div class="ch-name">Customer Support</div><div class="ch-meta">56 members</div></div><div class="ch-box"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+    </div>
+
+    <div class="sec">WhatsApp · pending</div>
+    <div class="ch-item" style="opacity:.35;cursor:default"><div class="ch-av" style="background:var(--layer3)"><svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--fg3)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div style="flex:1"><div class="ch-name" style="color:var(--fg3)">Connect WhatsApp</div><div class="ch-meta">Via Control → Integrations</div></div><span class="badge b-muted">Q3</span></div>
+
+    <div class="reach-bar">
+      <div><div class="reach-label">Estimated reach</div></div>
+      <div class="reach-count" id="reach-count">1,278</div>
+    </div>
+
+    <button class="btn-send" onclick="go('s-configure')">Continue — Configure timing</button>
+    <button class="btn-ghost" onclick="go('s-compose')">← Back to Compose</button>
+  </div>
+  <div class="nav">
+    <button class="ni on" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
+    <button class="ni" onclick="nav('analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</button>
+    <button class="ni" onclick="nav('settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Control</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: CONFIGURE ═══════════════ -->
+<div class="screen" id="s-configure">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
+  <div class="topbar">
+    <div class="topbar-left"><div class="eyebrow">New broadcast · 3 of 4</div><div class="page-title">Configure</div></div>
+    <span style="width:36px"></span>
+  </div>
+  <div class="progress-rail" id="pr-configure"></div>
+  <div class="body">
+    <div class="sec">Delivery timing</div>
+    <div class="timing-row">
+      <div class="timing-btn on" id="t-now" onclick="setTiming('now')"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Immediate</div>
+      <div class="timing-btn" id="t-sched" onclick="setTiming('sched')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Scheduled</div>
+    </div>
+    <div id="dt-row" style="display:none;flex-direction:column;gap:7px">
+      <div class="sec">Date & time</div>
+      <input type="datetime-local" style="padding:11px 13px;border-radius:var(--rs);border:1px solid var(--edge1);background:var(--layer1);color:var(--fg);font-family:var(--font);font-size:13px;outline:none;width:100%">
+    </div>
+
+    <div class="sec">Platform security</div>
+    <div class="notice n-green">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <p>All transmissions route through the MCP vault. Credentials are isolated — never exposed to this application layer.</p>
+    </div>
+
+    <div class="sec">Retry policy</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:0">
+      <div class="sum-row"><span class="sk">On failure</span><span class="sv">Auto-retry · up to 3 attempts</span></div>
+      <div class="sum-row"><span class="sk">Retry interval</span><span class="sv">5 min · exponential backoff</span></div>
+      <div class="sum-row"><span class="sk">On final failure</span><span class="sv">Flag in dispatch log</span></div>
+    </div>
+
+    <button class="btn-send" onclick="go('s-review')">Continue — Review & send</button>
+    <button class="btn-ghost" onclick="go('s-select')">← Back to Select</button>
+  </div>
+  <div class="nav">
+    <button class="ni on" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
+    <button class="ni" onclick="nav('analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</button>
+    <button class="ni" onclick="nav('settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Control</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: REVIEW ═══════════════ -->
+<div class="screen" id="s-review">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
+  <div class="topbar">
+    <div class="topbar-left"><div class="eyebrow">New broadcast · 4 of 4</div><div class="page-title">Review</div></div>
+    <span style="width:36px"></span>
+  </div>
+  <div class="progress-rail" id="pr-review"></div>
+  <div class="body">
+    <div class="sec">Dispatch summary</div>
+    <div class="card">
+      <div class="sum-row"><span class="sk">Content</span><span class="sv" id="rv-content">campaign_visual.jpg</span></div>
+      <div class="sum-row"><span class="sk">Channels</span><span class="sv" id="rv-ch">2 selected</span></div>
+      <div class="sum-row"><span class="sk">Estimated reach</span><span class="sv" id="rv-reach">1,278 recipients</span></div>
+      <div class="sum-row"><span class="sk">Platform</span><span class="sv">Telegram</span></div>
+      <div class="sum-row"><span class="sk">Timing</span><span class="sv" id="rv-timing">Immediate</span></div>
+      <div class="sum-row"><span class="sk">Auth</span><span class="sv" style="color:var(--green)">MCP vault — secured</span></div>
+    </div>
+
+    <div class="sec">Live dispatch status</div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 16px" id="ring-card">
+      <div class="send-status" style="padding:0">
+        <div class="ring-wrap">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle class="ring-bg" cx="36" cy="36" r="30"/>
+            <circle class="ring-fill" id="ring" cx="36" cy="36" r="30"/>
+          </svg>
+          <div class="ring-num" id="ring-label">—</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--fg3);letter-spacing:.5px;text-align:center" id="ring-status">Awaiting dispatch confirmation</div>
+    </div>
+
+    <button class="btn-send" id="btn-execute" onclick="executeDispatch()">Execute broadcast</button>
+    <button class="btn-ghost" onclick="go('s-configure')">← Back to Configure</button>
+  </div>
+  <div class="nav">
+    <button class="ni on" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
+    <button class="ni" onclick="nav('analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</button>
+    <button class="ni" onclick="nav('settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Control</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: MONITOR / ANALYTICS ═══════════════ -->
+<div class="screen active" id="s-analytics">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
+  <div class="topbar">
+    <div class="topbar-left"><div class="eyebrow">Command centre</div><div class="page-title">Dashboard</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="icon-btn" onclick="refreshAnalytics()"><svg viewBox="0 0 24 24" id="refresh-ic"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
+      <button class="icon-btn" style="background:var(--accent);border-color:var(--accent3);color:#0c0c0f;box-shadow:var(--glow-accent)" onclick="go('s-compose')" title="New broadcast">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="body">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:2px">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--fg3);letter-spacing:1px;text-transform:uppercase">Monday, 02 Jun</div>
+        <div style="font-family:var(--serif);font-size:19px;color:var(--fg);margin-top:2px;font-style:italic">Good morning.</div>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;cursor:pointer" onclick="go('s-compose')">+ New broadcast</div>
+    </div>
+    <div class="hero-metric">
+      <div class="hm-label">Total reach — today</div>
+      <div class="hm-number" id="hm-reach">2,206</div>
+      <div class="hm-sub" id="hm-sub">Across all active channels · 09:32 last dispatch</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--shine)">
+        <div style="font-size:9px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Active channels</div>
+        <div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--serif);font-size:22px;color:var(--accent)">4</span><span style="font-size:10px;color:var(--fg3)">Telegram</span></div>
+      </div>
+      <div style="flex:1;background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--shine)">
+        <div style="font-size:9px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Last broadcast</div>
+        <div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--serif);font-size:22px;color:var(--fg)">09:32</span><span style="font-size:10px;color:var(--fg3)">today</span></div>
+      </div>
+      <div style="flex:1;background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--shine)">
+        <div style="font-size:9px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Scheduled</div>
+        <div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--serif);font-size:22px;color:var(--amber)">1</span><span style="font-size:10px;color:var(--fg3)">pending</span></div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-c"><div class="stat-n" style="color:var(--accent)" id="st-sent">24</div><div class="stat-l">Dispatched</div></div>
+      <div class="stat-c"><div class="stat-n" style="color:var(--green)" id="st-ok">22</div><div class="stat-l">Delivered</div></div>
+      <div class="stat-c"><div class="stat-n" style="color:var(--amber)" id="st-q">1</div><div class="stat-l">Queued</div></div>
+      <div class="stat-c"><div class="stat-n" style="color:var(--red)" id="st-f">1</div><div class="stat-l">Retrying</div></div>
+    </div>
+    <div class="sec">Dispatch log</div>
+    <div id="log-list" style="display:flex;flex-direction:column;gap:7px"></div>
+
+  </div>
+  <div class="nav">
+    <button class="ni" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
+    <button class="ni on" onclick="nav('analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</button>
+    <button class="ni" onclick="nav('settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Control</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: CONTROL / SETTINGS ═══════════════ -->
+<div class="screen" id="s-settings">
+  <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
+  <div class="p-strip">
+    <div class="p-av">A</div>
+    <div style="flex:1"><div class="p-name">Administrator</div><div class="p-email">ops@organisation.com</div></div>
+    <div class="wordmark">VCAST</div>
+  </div>
+  <div class="body">
+    <div class="sec">Integrations</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="s-row" style="cursor:pointer" onclick="toast('Telegram integration active')"><div class="s-icon" style="background:var(--bl-dim)"><svg viewBox="0 0 24 24" style="stroke:var(--blue)"><path d="M21.5 2.5l-19 7.5 5.5 2 2 6 3-3.5 4 3 4.5-15z"/><path d="M8 12l3 3"/></svg></div><div style="flex:1"><div class="s-name">Telegram</div><div class="s-sub">4 channels · MCP vault active</div></div><span class="badge b-green">Live</span></div>
+      <div class="s-row" style="opacity:.4;cursor:default"><div class="s-icon" style="background:var(--g-dim)"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div style="flex:1"><div class="s-name">WhatsApp</div><div class="s-sub">Integration roadmap Q3</div></div><span class="badge b-muted">Q3</span></div>
+      <div class="s-row" style="opacity:.4;cursor:default"><div class="s-icon" style="background:var(--bl-dim)"><svg viewBox="0 0 24 24" style="stroke:var(--blue)"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></div><div style="flex:1"><div class="s-name">Facebook Groups</div><div class="s-sub">Integration roadmap Q3</div></div><span class="badge b-muted">Q3</span></div>
+    </div>
+    <button class="btn-send" onclick="go('s-ob1')">+ Register Telegram bot</button>
+
+    <div class="sec">Operational rules</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="s-row"><div style="flex:1"><div class="s-name">Auto-retry on failure</div><div class="s-sub">Up to 3 attempts · exponential backoff</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tknob"></div></div></div>
+      <div class="s-row"><div style="flex:1"><div class="s-name">Delivery alerts</div><div class="s-sub">Push notification on all outcomes</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tknob"></div></div></div>
+      <div class="s-row"><div style="flex:1"><div class="s-name">Require message body</div><div class="s-sub">Block dispatch if message empty</div></div><div class="toggle off" onclick="this.classList.toggle('on');this.classList.toggle('off')"><div class="tknob"></div></div></div>
+    </div>
+
+    <div class="sec">System</div>
+    <div class="s-row" style="background:var(--r-dim);border-color:rgba(239,68,68,.2);cursor:pointer" onclick="toast('Logs purged (demo)')"><div class="s-icon" style="background:transparent"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div><div style="flex:1"><div class="s-name" style="color:var(--red)">Purge all logs</div><div class="s-sub" style="color:rgba(239,68,68,.6)">Irreversible action</div></div></div>
+    <div style="text-align:center;font-size:10px;color:var(--fg3);letter-spacing:.5px;padding:6px 0">VCAST v1.0 · Process Demo · MCP Secured</div>
+  </div>
+  <div class="nav">
+    <button class="ni" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
+    <button class="ni" onclick="nav('analytics')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</button>
+    <button class="ni on" onclick="nav('settings')"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Control</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: ONBOARD 1 ═══════════════ -->
+<div class="screen" id="s-ob1">
+  <div class="sbar"><span>9:41</span></div>
+  <div class="topbar"><button class="icon-btn" onclick="go('s-settings')"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><div class="topbar-left"><div class="eyebrow">Bot registration</div><div class="page-title">Step 1 of 3</div></div><span style="font-size:10px;color:var(--fg3);font-weight:600;letter-spacing:.5px">1 / 3</span></div>
+  <div class="body">
+    <div class="dot-row"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 0 6px;text-align:center">
+      <div class="ob-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <div class="ob-title">Create your bot</div>
+      <div class="ob-desc">Register a Telegram bot via BotFather — takes under two minutes.</div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:13px">
+      <div class="step-row"><div class="step-n">1</div><div><div class="step-title">Open BotFather</div><div class="step-desc">Search @BotFather in Telegram and tap Start.</div></div></div>
+      <hr>
+      <div class="step-row"><div class="step-n">2</div><div><div class="step-title">Send /newbot</div><div class="step-desc">Choose a name and a username ending in "bot".</div></div></div>
+      <hr>
+      <div class="step-row"><div class="step-n">3</div><div><div class="step-title">Copy the API token</div><div class="step-desc">BotFather returns a token — keep it ready for the next step.</div></div></div>
+    </div>
+    <div class="notice n-green"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><p>Token transmits directly to the MCP vault via encrypted channel. This application has zero access to it at any stage.</p></div>
+    <button class="btn-send" onclick="go('s-ob2')">I have my token — continue</button>
+    <button class="btn-ghost" onclick="go('s-settings')">Cancel registration</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: ONBOARD 2 ═══════════════ -->
+<div class="screen" id="s-ob2">
+  <div class="sbar"><span>9:41</span></div>
+  <div class="topbar"><button class="icon-btn" onclick="go('s-ob1')"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><div class="topbar-left"><div class="eyebrow">Bot registration</div><div class="page-title">Step 2 of 3</div></div><span style="font-size:10px;color:var(--fg3);font-weight:600;letter-spacing:.5px">2 / 3</span></div>
+  <div class="body">
+    <div class="dot-row"><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 0 6px;text-align:center">
+      <div class="ob-icon"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
+      <div class="ob-title">Vault handoff</div>
+      <div class="ob-desc">Token is encrypted on-device and transferred directly to the MCP vault.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px"><div class="sec">API token</div><input type="password" id="tok" placeholder="110201543:AAHdqTcvCH1vGWJx…" autocomplete="off"><div style="font-size:10px;color:var(--fg3);letter-spacing:.1px">Masked · format: numeric_id:AlphaNumericString</div></div>
+    <div style="display:flex;flex-direction:column;gap:7px"><div class="sec">Bot identifier</div><input type="text" id="bname" placeholder="e.g. OrgDispatchBot"></div>
+    <div class="card" style="display:flex;align-items:flex-start;gap:11px"><svg width="17" height="17" viewBox="0 0 24 24" stroke="var(--green)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><p style="font-size:12px;color:var(--fg2);line-height:1.65">TLS-encrypted. Stored exclusively in the MCP server vault. Non-retrievable and never accessible to this application layer.</p></div>
+    <button class="btn-send" id="btn-verify" onclick="doVerify()">Verify and commit token</button>
+    <button class="btn-ghost" onclick="go('s-ob1')">← Back to step 1</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN: ONBOARD 3 ═══════════════ -->
+<div class="screen" id="s-ob3">
+  <div class="sbar"><span>9:41</span></div>
+  <div class="topbar"><span style="width:36px"></span><div class="topbar-left"><div class="eyebrow">Bot registration</div><div class="page-title">Step 3 of 3</div></div><span style="font-size:10px;color:var(--fg3);font-weight:600;letter-spacing:.5px">3 / 3</span></div>
+  <div class="body">
+    <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0 10px;text-align:center">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--g-dim);border:1px solid rgba(62,207,142,.3);display:flex;align-items:center;justify-content:center;margin:0 auto"><svg width="28" height="28" viewBox="0 0 24 24" stroke="var(--green)" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="ob-title" style="font-style:italic;color:var(--accent)">Integration active</div>
+      <div class="ob-desc">Bot operational. MCP vault managing all credentials.</div>
+    </div>
+    <div class="card">
+      <div style="font-size:9px;font-weight:600;letter-spacing:1px;color:var(--fg3);text-transform:uppercase;margin-bottom:10px">Bot record</div>
+      <div class="sum-row"><span class="sk">Identifier</span><span class="sv" id="ob-nm">OrgDispatchBot</span></div>
+      <div class="sum-row"><span class="sk">Status</span><span class="sv" style="color:var(--green)">Operational</span></div>
+      <div class="sum-row"><span class="sk">Auth method</span><span class="sv" style="color:var(--green)">MCP vault</span></div>
+      <div class="sum-row"><span class="sk">Channels found</span><span class="sv">0 — add bot to channels first</span></div>
+    </div>
+    <div class="notice n-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>Add to each Telegram group: open group → Add member → search your bot username → confirm. Channels register automatically.</p></div>
+    <button class="btn-send" onclick="nav('settings')">Return to Control</button>
+  </div>
+</div>
+
+<!-- OVERLAY + TOAST -->
+<div id="overlay"><div class="ov-ring"></div><div class="ov-label" style="color:var(--accent)">Transmitting</div><div class="ov-sub" style="color:var(--fg3)">Routing via MCP vault</div></div>
+<div id="toast"></div>
+
+<script>
+/* ── CONSTANTS ──────────────────────────── */
+const STAGES=['compose','select','configure','review','monitor'];
+const STAGE_LABELS=['Compose','Select','Configure','Review'];
+const STAGE_SCREENS=['s-compose','s-select','s-configure','s-review','s-analytics'];
+const REACH_MAP={0:0,1:38,2:1278,3:1316,4:2206}; // cumulative reach by selection count
+
+const LOGS=[
+  {s:'ok', t:'campaign_visual.jpg → Tech Founders Hub', m:'Telegram · 1,240 members', ts:'09:32'},
+  {s:'ok', t:'campaign_visual.jpg → Marketing Team', m:'Telegram · 38 members', ts:'09:32'},
+  {s:'ok', t:'Q2 brief link → Tech Founders Hub', m:'Telegram · 1,240 members', ts:'09:15'},
+  {s:'pend',t:'product_brief.pdf → Announcements', m:'Scheduled · 10:00', ts:'queued'},
+  {s:'fail',t:'launch_reel.mp4 → Customer Support', m:'Rate limit · retry pending', ts:'09:18'},
+  {s:'ok', t:'internal_memo.txt → Marketing Team', m:'Telegram · 38 members', ts:'08:55'},
+];
+
+/* ── STATE ──────────────────────────────── */
+let cur='s-analytics', toastT, uploaded=false, dispatchDone=false;
+
+/* ── PROGRESS RAIL ──────────────────────── */
+function renderRail(containerId, activeIdx){
+  const c=document.getElementById(containerId);
+  if(!c)return;
+  let h=`<div class="progress-stages">`;
+  STAGE_LABELS.forEach((lbl,i)=>{
+    if(i>0)h+=`<div class="ps-line${i<=activeIdx?' done':''}"></div>`;
+    const cls=i<activeIdx?'done':i===activeIdx?'active':'';
+    h+=`<div class="ps"><div class="ps-dot ${cls}"></div><div class="ps-label ${cls}">${lbl}</div></div>`;
+  });
+  h+=`</div>`;
+  c.innerHTML=h;
+}
+
+/* ── SCREEN TRANSITIONS ─────────────────── */
+function go(id){
+  const p=document.getElementById(cur);
+  p.classList.remove('active');p.classList.add('out');
+  setTimeout(()=>p.classList.remove('out'),260);
+  cur=id;
+  const n=document.getElementById(id);
+  n.classList.add('active');
+  // render rails for broadcast flow screens
+  const idx={'s-compose':0,'s-select':1,'s-configure':2,'s-review':3};
+  if(idx[id]!==undefined)renderRail(`pr-${id.replace('s-','')}`,idx[id]);
+}
+
+function nav(tab){
+  const map={compose:'s-compose',analytics:'s-analytics',settings:'s-settings'};
+  if(map[tab])go(map[tab]);
+}
+
+/* ── COMPOSE ACTIONS ─────────────────────── */
+function pickFmt(el){document.querySelectorAll('.fmt').forEach(f=>f.classList.remove('on'));el.classList.add('on');}
+
+function stageUpload(){
+  if(uploaded)return;
+  const z=document.getElementById('zone');
+  z.style.borderColor='var(--accent3)';z.style.background='var(--a-dim)';
+  setTimeout(()=>{
+    z.style.display='none';
+    document.getElementById('fp').style.display='flex';
+    uploaded=true;
+    toast('Content staged');
+  },700);
+}
+
+/* ── SELECT ACTIONS ──────────────────────── */
+let allOn=false;
+function selectAll(){
+  allOn=!allOn;
+  document.querySelectorAll('#ch-list .ch-item').forEach(c=>{
+    c.classList.toggle('on',allOn);
+    c.querySelector('.ch-box').classList.toggle('on',allOn);
+  });
+  updateReach();
+}
+
+function toggleCh(el){
+  el.classList.toggle('on');
+  el.querySelector('.ch-box').classList.toggle('on');
+  updateReach();
+}
+
+function filterCh(q){
+  document.querySelectorAll('#ch-list .ch-item').forEach(c=>{
+    const nm=c.querySelector('.ch-name').textContent.toLowerCase();
+    c.style.display=nm.includes(q.toLowerCase())?'flex':'none';
+  });
+}
+
+function updateReach(){
+  const n=document.querySelectorAll('#ch-list .ch-item.on').length;
+  const r=REACH_MAP[n]||0;
+  document.getElementById('reach-count').textContent=r.toLocaleString();
+  document.getElementById('rv-ch').textContent=n+' channel'+(n!==1?'s':'');
+  document.getElementById('rv-reach').textContent=r.toLocaleString()+' recipients';
+}
+
+/* ── CONFIGURE ACTIONS ─────────────────── */
+function setTiming(m){
+  document.getElementById('t-now').classList.toggle('on',m==='now');
+  document.getElementById('t-sched').classList.toggle('on',m==='sched');
+  document.getElementById('dt-row').style.display=m==='sched'?'flex':'none';
+  document.getElementById('rv-timing').textContent=m==='now'?'Immediate':'Scheduled';
+}
+
+/* ── REVIEW / EXECUTE ─────────────────── */
+function executeDispatch(){
+  if(dispatchDone)return;
+  const btn=document.getElementById('btn-execute');
+  btn.textContent='Executing…';btn.disabled=true;
+  const ring=document.getElementById('ring');
+  const label=document.getElementById('ring-label');
+  const status=document.getElementById('ring-status');
+  ring.classList.add('sending');
+  status.textContent='Dispatching via MCP vault…';
+  // animate count
+  let n=document.querySelectorAll('#ch-list .ch-item.on').length;
+  let sent=0;
+  const tick=setInterval(()=>{
+    if(sent>=n){clearInterval(tick);finishDispatch(n,btn,ring,label,status);return;}
+    sent++;
+    label.textContent=sent+'/'+n;
+    status.textContent='Sent to channel '+sent+' of '+n+'…';
+  },600);
+}
+
+function finishDispatch(n,btn,ring,label,status){
+  ring.classList.remove('sending');ring.classList.add('done');
+  label.textContent='✓';
+  status.textContent='All '+n+' channel'+(n!==1?'s':'')+' delivered successfully';
+  btn.textContent='Broadcast complete';
+  dispatchDone=true;
+  // update analytics
+  const reach=parseInt(document.getElementById('reach-count').textContent.replace(/,/g,''))||1278;
+  const prev=parseInt(document.getElementById('hm-reach').textContent.replace(/,/g,'')||'2206');
+  document.getElementById('hm-reach').textContent=(prev+reach).toLocaleString();
+  document.getElementById('st-sent').textContent=parseInt(document.getElementById('st-sent').textContent)+n;
+  document.getElementById('st-ok').textContent=parseInt(document.getElementById('st-ok').textContent)+n;
+  // add to log
+  const ch=['Tech Founders Hub','Marketing Team','Announcements','Customer Support'];
+  const fn=uploaded?'campaign_visual.jpg':'content';
+  for(let i=0;i<Math.min(n,4);i++)LOGS.unshift({s:'ok',t:fn+' → '+ch[i],m:'Telegram · just now',ts:'now'});
+  renderLogs();
+  setTimeout(()=>go('s-analytics'),900);
+}
+
+/* ── ANALYTICS ───────────────────────── */
+function refreshAnalytics(){
+  const ic=document.getElementById('refresh-ic');
+  ic.style.animation='spin .9s linear infinite';
+  setTimeout(()=>{ic.style.animation='';toast('Data refreshed');},1200);
+}
+
+function renderLogs(){
+  const l=document.getElementById('log-list');
+  if(!l)return;
+  l.innerHTML='';
+  LOGS.slice(0,8).forEach(log=>{
+    const col=log.s==='ok'?'var(--green)':log.s==='pend'?'var(--amber)':'var(--red)';
+    const mc=log.s==='fail'?'var(--red)':'var(--fg3)';
+    l.innerHTML+=`<div class="log-row"><div class="ld" style="background:${col}"></div><div style="flex:1;min-width:0"><div class="lt">${log.t}</div><div class="lm" style="color:${mc}">${log.m}</div></div><div class="ltime">${log.ts}</div></div>`;
+  });
+}
+
+/* ── ONBOARD ─────────────────────────── */
+function doVerify(){
+  const tok=document.getElementById('tok').value.trim();
+  const nm=document.getElementById('bname').value.trim()||'OrgDispatchBot';
+  if(!tok){toast('API token required');return;}
+  const btn=document.getElementById('btn-verify');
+  btn.textContent='Verifying…';btn.disabled=true;
+  setTimeout(()=>{btn.textContent='Verify and commit token';btn.disabled=false;document.getElementById('ob-nm').textContent=nm;go('s-ob3');},1600);
+}
+
+/* ── REVIEW SYNC ─────────────────────── */
+function syncReview(){
+  document.getElementById('rv-content').textContent=uploaded?'campaign_visual.jpg':'No file uploaded';
+  updateReach();
+}
+
+/* ── TOAST ───────────────────────────── */
+function toast(m){
+  const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ── INIT ────────────────────────────── */
+renderRail('pr-compose',0);
+renderLogs();
+// sync review before entering
+const orig=go;
+window.go=function(id){
+  if(id==='s-review')syncReview();
+  orig(id);
+};
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
