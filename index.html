@@ -71,6 +71,13 @@ body::before{
     radial-gradient(ellipse 400px 360px at 75% 86%, rgba(255,214,147,.18) 0%, transparent 75%),
     linear-gradient(180deg, rgba(255,255,255,.30), transparent 38%, rgba(211,233,249,.18));
 }
+#splash{position:fixed;inset:0;z-index:400;display:flex;align-items:stretch;justify-content:stretch;background:linear-gradient(180deg,rgba(231,244,255,.96) 0%,rgba(214,235,251,.96) 42%,rgba(242,249,255,.98) 100%);transition:opacity .45s ease,visibility .45s ease}
+#splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-card{width:100%;height:100%;display:flex;align-items:stretch;justify-content:stretch;position:relative;background:#0f2e5a;overflow:hidden}
+.splash-card::before{content:'';position:absolute;inset:0;border:2px solid rgba(255,204,84,.74);box-shadow:inset 0 0 0 5px rgba(255,174,47,.08),inset 0 0 24px rgba(255,204,84,.16),0 0 22px rgba(255,174,47,.08);pointer-events:none;border-radius:0;z-index:4}
+.splash-card img{width:100%;height:100%;object-fit:fill;object-position:center center;border-radius:0;padding:0;box-shadow:none;display:block}
+.splash-watermark{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.18;mix-blend-mode:screen;filter:blur(.2px) saturate(1.05) brightness(1.08)}
+.splash-watermark img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 
 /* ─── SCREENS ─────────────────────────────── */
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(22px);transition:opacity var(--mid) var(--ease),transform var(--mid) var(--ease);background:transparent}
@@ -239,9 +246,19 @@ textarea::placeholder,input::placeholder{color:var(--fg3)}
   #app{max-width:660px}
 }
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat-c{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:14px;box-shadow:var(--shine)}
+.stat-c{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:14px;box-shadow:var(--shine);min-height:82px;display:flex;flex-direction:column;justify-content:space-between}
 .stat-n{font-family:var(--serif);font-size:28px;font-weight:400;letter-spacing:-1px;line-height:1}
 .stat-l{font-size:9px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--fg3);margin-top:4px}
+
+/* ─── ANALYTICS SUMMARY ROW ───────────────── */
+.metric-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch}
+.metric-card{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:14px 13px;box-shadow:var(--shine);min-height:88px;display:flex;flex-direction:column;justify-content:space-between}
+.metric-card .k{font-size:9px;font-weight:700;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;line-height:1.25}
+.metric-card .v{display:flex;align-items:baseline;gap:6px;min-height:28px}
+.metric-card .v .num{font-family:var(--serif);font-size:22px;line-height:1;color:var(--fg)}
+.metric-card .v .num.accent{color:var(--accent)}
+.metric-card .v .num.warn{color:var(--amber)}
+.metric-card .v .sub{font-size:10px;color:var(--fg3);line-height:1.2}
 
 /* ─── LOG ROWS ────────────────────────────── */
 .log-row{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:var(--rx);background:var(--layer2);border:1px solid var(--edge1)}
@@ -284,9 +301,15 @@ textarea::placeholder,input::placeholder{color:var(--fg3)}
 .p-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--fg)}
 .p-email{font-size:11px;color:var(--fg3);margin-top:1px}
 .brand-badge{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,249,236,.88));border:1px solid rgba(255,174,47,.24);box-shadow:0 8px 18px rgba(255,174,47,.10),var(--shine)}
-.brand-mark{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 0 0 4px rgba(255,174,47,.08),0 0 16px rgba(255,174,47,.18)}
-.brand-mark svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.brand-mark{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 0 0 4px rgba(255,174,47,.08),0 0 16px rgba(255,174,47,.18);overflow:hidden}
+.brand-mark img{width:100%;height:100%;object-fit:cover;display:block}
 .brand-name{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--fg);letter-spacing:.4px;font-weight:700}
+.hero-logo{display:flex;align-items:center;gap:12px}
+.hero-logo-mark{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 10px 24px rgba(255,174,47,.20),0 0 0 6px rgba(255,174,47,.08);overflow:hidden}
+.hero-logo-mark img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-logo-text{display:flex;flex-direction:column;gap:2px}
+.hero-logo-text .kicker{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent)}
+.hero-logo-text .name{font-family:var(--serif);font-size:24px;font-weight:400;font-style:italic;line-height:1;color:var(--fg)}
 
 /* ─── ONBOARDING STEPS ─────────────────────── */
 .ob-icon{width:62px;height:62px;border-radius:20px;background:linear-gradient(135deg,rgba(255,174,47,.16),rgba(62,127,220,.10));border:1.5px solid rgba(255,174,47,.28);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 22px rgba(255,215,120,.12),var(--glow-accent)}
@@ -335,6 +358,12 @@ hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
 </style>
 </head>
 <body>
+<div id="splash">
+  <div class="splash-card">
+    <img src="Lumia2.png" alt="Lumina loading splash">
+    <div class="splash-watermark" aria-hidden="true"><img src="Lumia2.png" alt=""></div>
+  </div>
+</div>
 <div id="app">
 
 <!-- ═══════════════ SCREEN: COMPOSE ═══════════════ -->
@@ -510,7 +539,10 @@ hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
 <div class="screen active" id="s-analytics">
   <div class="sbar"><span>9:41</span><div class="sbar-icons"><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M1 6s4-4 11-4 11 4 11 4M5 10s2.5-2.5 7-2.5 7 2.5 7 2.5M9 14s1.5-1.5 3-1.5 3 1.5 3 1.5M12 18h.01"/></svg><svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="18" height="11" rx="2"/><path d="M22 11v4"/></svg></div></div>
   <div class="topbar">
-    <div class="topbar-left"><div class="eyebrow">Command centre</div><div class="page-title">Dashboard</div></div>
+    <div class="hero-logo">
+      <div class="hero-logo-mark"><img src="lumina-icon.png" alt="Lumina icon"></div>
+      <div class="hero-logo-text"><div class="kicker">Lumina</div><div class="name">Dashboard</div></div>
+    </div>
     <div style="display:flex;gap:8px;align-items:center">
       <button class="icon-btn" onclick="refreshAnalytics()"><svg viewBox="0 0 24 24" id="refresh-ic"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
       <button class="icon-btn" style="background:var(--accent);border-color:var(--accent3);color:#0c0c0f;box-shadow:var(--glow-accent)" onclick="go('s-compose')" title="New broadcast">
@@ -541,18 +573,18 @@ hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:8px">
-      <div style="flex:1;background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--shine)">
-        <div style="font-size:9px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Active channels</div>
-        <div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--serif);font-size:22px;color:var(--accent)">4</span><span style="font-size:10px;color:var(--fg3)">Telegram</span></div>
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="k">Active channels</div>
+        <div class="v"><span class="num accent">4</span><span class="sub">Telegram</span></div>
       </div>
-      <div style="flex:1;background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--shine)">
-        <div style="font-size:9px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Last broadcast</div>
-        <div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--serif);font-size:22px;color:var(--fg)">09:32</span><span style="font-size:10px;color:var(--fg3)">today</span></div>
+      <div class="metric-card">
+        <div class="k">Last broadcast</div>
+        <div class="v"><span class="num">09:32</span><span class="sub">today</span></div>
       </div>
-      <div style="flex:1;background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:11px 13px;box-shadow:var(--shine)">
-        <div style="font-size:9px;font-weight:600;color:var(--fg3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px">Scheduled</div>
-        <div style="display:flex;align-items:baseline;gap:5px"><span style="font-family:var(--serif);font-size:22px;color:var(--amber)">1</span><span style="font-size:10px;color:var(--fg3)">pending</span></div>
+      <div class="metric-card">
+        <div class="k">Scheduled</div>
+        <div class="v"><span class="num warn">1</span><span class="sub">pending</span></div>
       </div>
     </div>
     <div class="stat-grid">
@@ -578,7 +610,7 @@ hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
   <div class="p-strip">
     <div class="p-av">A</div>
     <div style="flex:1"><div class="p-name">Administrator</div><div class="p-email">ops@organisation.com</div></div>
-    <div class="brand-badge"><div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 3v4"/><path d="M12 17v4"/><path d="M5 12H1"/><path d="M23 12h-4"/><path d="M6.2 6.2l2.8 2.8"/><path d="M17 17l2.8 2.8"/><path d="M17.8 6.2L15 9"/><path d="M6.2 17.8L9 15"/></svg></div><div class="brand-name">Lumina</div></div>
+    <div class="brand-badge"><div class="brand-mark"><img src="lumina-icon.png" alt="Lumina icon"></div><div class="brand-name">Lumina</div></div>
   </div>
   <div class="body">
     <div class="sec">Integrations</div>
@@ -697,6 +729,7 @@ const LOGS=[
 let cur='s-analytics', toastT, uploaded=false, dispatchDone=false;
 let liveReach=2206, liveLikes=1084;
 let meterSweepT;
+let splashT;
 
 /* ── PROGRESS RAIL ──────────────────────── */
 function renderRail(containerId, activeIdx){
@@ -930,6 +963,13 @@ renderRail('pr-compose',0);
 renderLogs();
 renderOdometer(document.getElementById('hm-reach'), liveReach);
 simulateLiveMeters();
+window.addEventListener('load',()=>{
+  clearTimeout(splashT);
+  splashT=setTimeout(()=>{
+    const s=document.getElementById('splash');
+    if(s)s.classList.add('hide');
+  },5000);
+});
 // sync review before entering
 const orig=go;
 window.go=function(id){
