@@ -59,8 +59,8 @@
 }
 /* ─── BASE ─────────────────────────────────── */
 html,body{height:100%;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 36%,var(--bg3) 70%,var(--bg4) 100%);font-family:var(--font);color:var(--fg);-webkit-font-smoothing:antialiased;font-size:15px}
-body{min-height:100vh}
-#app{height:100%;display:flex;flex-direction:column;width:min(100vw,560px);max-width:560px;margin:0 auto;position:relative;overflow:hidden}
+body{min-height:100vh;display:flex;justify-content:center}
+#app{height:100%;display:flex;flex-direction:column;width:100vw;max-width:100vw;margin:0 auto;position:relative;overflow:hidden}
 body::before{
   content:'';
   position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -237,10 +237,12 @@ textarea::placeholder,input::placeholder{color:var(--fg3)}
   100%{opacity:0;transform:scale(1.14)}
 }
 @media (min-width: 430px){
-  #app{width:min(100vw,620px);max-width:620px}
   .body{gap:14px}
   .topbar{padding-top:12px;padding-bottom:14px}
   .sbar{padding-top:16px}
+}
+@media (min-width: 720px){
+  #app{width:min(100vw,620px);max-width:620px}
 }
 @media (min-width: 900px){
   #app{max-width:660px}
