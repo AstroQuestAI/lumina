@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#bfd8ef">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="VCAST">
-<title>VCAST</title>
+<meta name="apple-mobile-web-app-title" content="Lumina">
+<title>Lumina</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -283,7 +283,10 @@ textarea::placeholder,input::placeholder{color:var(--fg3)}
 .p-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:16px;color:#fff;box-shadow:0 8px 20px rgba(255,174,47,.22),0 0 18px rgba(255,215,120,.14)}
 .p-name{font-family:var(--serif);font-size:18px;font-weight:400;color:var(--fg)}
 .p-email{font-size:11px;color:var(--fg3);margin-top:1px}
-.wordmark{font-family:var(--serif);font-size:13px;font-style:italic;color:var(--accent);letter-spacing:.5px;font-weight:800;text-shadow:0 0 10px rgba(255,174,47,.18)}
+.brand-badge{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,249,236,.88));border:1px solid rgba(255,174,47,.24);box-shadow:0 8px 18px rgba(255,174,47,.10),var(--shine)}
+.brand-mark{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 0 0 4px rgba(255,174,47,.08),0 0 16px rgba(255,174,47,.18)}
+.brand-mark svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-family:var(--serif);font-size:14px;font-style:italic;color:var(--fg);letter-spacing:.4px;font-weight:700}
 
 /* ─── ONBOARDING STEPS ─────────────────────── */
 .ob-icon{width:62px;height:62px;border-radius:20px;background:linear-gradient(135deg,rgba(255,174,47,.16),rgba(62,127,220,.10));border:1.5px solid rgba(255,174,47,.28);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 22px rgba(255,215,120,.12),var(--glow-accent)}
@@ -575,7 +578,7 @@ hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
   <div class="p-strip">
     <div class="p-av">A</div>
     <div style="flex:1"><div class="p-name">Administrator</div><div class="p-email">ops@organisation.com</div></div>
-    <div class="wordmark">VCAST</div>
+    <div class="brand-badge"><div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 3v4"/><path d="M12 17v4"/><path d="M5 12H1"/><path d="M23 12h-4"/><path d="M6.2 6.2l2.8 2.8"/><path d="M17 17l2.8 2.8"/><path d="M17.8 6.2L15 9"/><path d="M6.2 17.8L9 15"/></svg></div><div class="brand-name">Lumina</div></div>
   </div>
   <div class="body">
     <div class="sec">Integrations</div>
@@ -595,7 +598,7 @@ hr{border:none;border-top:1px solid var(--edge1);margin:2px 0}
 
     <div class="sec">System</div>
     <div class="s-row" style="background:var(--r-dim);border-color:rgba(239,68,68,.2);cursor:pointer" onclick="toast('Logs purged (demo)')"><div class="s-icon" style="background:transparent"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div><div style="flex:1"><div class="s-name" style="color:var(--red)">Purge all logs</div><div class="s-sub" style="color:rgba(239,68,68,.6)">Irreversible action</div></div></div>
-    <div style="text-align:center;font-size:10px;color:var(--fg3);letter-spacing:.5px;padding:6px 0">VCAST v1.0 · Process Demo · MCP Secured</div>
+    <div style="text-align:center;font-size:10px;color:var(--fg3);letter-spacing:.5px;padding:6px 0">Lumina v1.0 · Process Demo · MCP Secured</div>
   </div>
   <div class="nav">
     <button class="ni" onclick="nav('compose')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Dispatch</button>
