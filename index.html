@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#bfd8ef">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -59,8 +59,8 @@
 }
 /* ─── BASE ─────────────────────────────────── */
 html,body{height:100%;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 36%,var(--bg3) 70%,var(--bg4) 100%);font-family:var(--font);color:var(--fg);-webkit-font-smoothing:antialiased;font-size:15px}
-body{min-height:100vh;display:flex;justify-content:center}
-#app{height:100%;display:flex;flex-direction:column;width:100vw;max-width:100vw;margin:0 auto;position:relative;overflow:hidden}
+body{min-height:100dvh;display:flex;justify-content:center;overflow:hidden}
+#app{height:100dvh;display:flex;flex-direction:column;width:430px;min-width:430px;max-width:430px;margin:0 auto;position:relative;overflow:hidden}
 body::before{
   content:'';
   position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -241,11 +241,13 @@ textarea::placeholder,input::placeholder{color:var(--fg3)}
   .topbar{padding-top:12px;padding-bottom:14px}
   .sbar{padding-top:16px}
 }
-@media (min-width: 720px){
-  #app{width:min(100vw,620px);max-width:620px}
+@media (max-width: 768px){
+  body{justify-content:stretch}
+  #app{width:100vw;min-width:100vw;max-width:100vw}
 }
 @media (min-width: 900px){
-  #app{max-width:660px}
+  body{justify-content:center}
+  #app{width:430px;min-width:430px;max-width:430px}
 }
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stat-c{background:var(--layer2);border:1px solid var(--edge1);border-radius:var(--rs);padding:14px;box-shadow:var(--shine);min-height:82px;display:flex;flex-direction:column;justify-content:space-between}
